@@ -1,4 +1,4 @@
-from app.models.utils import *
+from .utils import *
 from typing import List, Tuple
 from bisect import bisect_right
 from collections import namedtuple
