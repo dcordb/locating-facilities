@@ -18,6 +18,7 @@ class FacilitiesCanvas(FigureCanvas):
 
     def __init__(self, fig: Figure) -> None:
         FigureCanvas.__init__(self, fig)
+        self.setSizePolicy(qtw.QSizePolicy.MinimumExpanding, qtw.QSizePolicy.MinimumExpanding)
 
     def updateCanvas(self, near: List[PointW] = [], far: List[PointW] = [], *sols) -> None:
         x = [0, 1, 2, 3, 2, 2]

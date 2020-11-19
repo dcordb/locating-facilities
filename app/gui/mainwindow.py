@@ -17,14 +17,18 @@ class ActionWidget(qtw.QWidget):
 
         self.setLayout(qtw.QHBoxLayout())
 
-        btnLoad = qtw.QPushButton('&Load')
-        btnSave = qtw.QPushButton('&Save')
-        labInfo = qtw.QLabel('Information...')
-        btnHelp = qtw.QPushButton('&Help')
+        btnLoad = qtw.QPushButton('&Load/Modify', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        btnSave = qtw.QPushButton('&Save', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        labInfo = qtw.QLabel()
+        btnHelp = qtw.QPushButton('&Help', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        separator = qtw.QFrame()
+        separator.setFrameStyle(qtw.QFrame.VLine | qtw.QFrame.Raised)
 
         self.layout().addWidget(btnLoad)
         self.layout().addWidget(btnSave)
+        self.layout().addWidget(separator)
         self.layout().addWidget(labInfo)
+        self.layout().addStretch()
         self.layout().addWidget(btnHelp)
 
 class CentralWidget(qtw.QWidget):
