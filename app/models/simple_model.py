@@ -3,32 +3,32 @@ from typing import List, Tuple
 from bisect import bisect_right
 from collections import namedtuple
 
-C = namedtuple('C', ['c', 'w'])
+C = namedtuple('C', ['c', 'w'], defaults=[0])
 
-class SimpleModel:
-    def __init__(self, near: List[PointW], far: List[PointW], xmin: float, xmax: float, ymin: float, ymax: float) -> None:
+class FastModel:
+    def __init__(self, near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: float, ymax: float) -> None:
         self.logger = init_logger('Simple Model')
         self.logger.info('Calculating optimal x')
 
         # find optimal x
-        xnear = [ C(x, w) for x, _, w in near ]
-        xfar = [ C(x, w) for x, _, w in far ]
-        xboundaries = [ C(xmin, 1), C(xmax, 1) ]
+        xnear = [ C(x, w) for x, _, w, _ in near ]
+        xfar = [ C(x, w) for x, _, w, _ in far ]
+        xboundaries = [ C(xmin), C(xmax) ]
 
         x, cx = self.solvecoord(xnear, xfar, xboundaries)
 
         self.logger.info('Calculating optimal y')
         
         # find optimal y
-        ynear = [ C(y, w) for _, y, w in near ]
-        yfar = [ C(y, w) for _, y, w in far ]
-        yboundaries = [C(ymin, 1), C(ymax, 1)]
+        ynear = [ C(y, w) for _, y, w, _ in near ]
+        yfar = [ C(y, w) for _, y, w, _ in far ]
+        yboundaries = [C(ymin), C(ymax)]
 
         y, cy = self.solvecoord(ynear, yfar, yboundaries)
 
         self.near = near
         self.far = far
-        self.optimalpt = Point(x, y)
+        self.optimalpt = PT(x, y, kind=self.__class__.__name__)
         self.cost = cx + cy
 
     def solvecoord(self, cnear: List[C], cfar: List[C], boundaries: List[C]) -> Tuple[float, float]:
@@ -91,8 +91,8 @@ class SimpleModel:
 
         return x * m + n
 
-    def eval(p: Point, near: List[PointW], far: List[PointW]):
-        return SimpleModel._arrcost(p, near) - SimpleModel._arrcost(p, far)
+    def eval(p: PT, near: List[PT], far: List[PT]):
+        return FastModel._arrcost(p, near) - FastModel._arrcost(p, far)
 
     def _arrcost(p, arr):
         cost = 0
@@ -102,18 +102,18 @@ class SimpleModel:
         return cost
 
 if __name__ == '__main__':
-    m1 = SimpleModel([PointW(1, 4)], [PointW(5, 1)], -5, 5, -2, 7)
+    m1 = FastModel([PT(1, 4, w=1)], [PT(5, 1, w=1)], -5, 5, -2, 7)
     print(f'pt={m1.optimalpt}, cost={m1.cost}')
 
-    near = [PointW(1, 4), PointW(4, 2), PointW(3, 2)]
-    far = [PointW(5, 1), PointW(3, 7), PointW(1.5, 1, 1.5)]
-    m2 = SimpleModel(near, far, -8, 8, -8, 8)
+    near = [PT(1, 4, w=1), PT(4, 2, w=1), PT(3, 2, w=1)]
+    far = [PT(5, 1, w=1), PT(3, 7, w=1), PT(1.5, 1, w=1.5)]
+    m2 = FastModel(near, far, -8, 8, -8, 8)
     print(f'pt={m2.optimalpt}, cost={m2.cost}')
 
     e = []
     for x in range(-8, 9):
         for y in range(-8, 9):
-            e.append((x, y, SimpleModel.eval(Point(x, y), near, far)))
+            e.append((x, y, FastModel.eval(PT(x, y), near, far)))
 
     e.sort(key=lambda x: x[2])
 

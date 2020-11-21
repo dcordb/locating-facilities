@@ -1,8 +1,7 @@
 from collections import namedtuple
 import logging
 
-Point = namedtuple('Point', ['x', 'y'])
-PointW = namedtuple('PointW', ['x', 'y', 'w'], defaults=[1])
+PT = namedtuple('PT', ['x', 'y', 'w', 'kind'], defaults=[0, None])
 
 def init_logger(logger_name):
     # create logger

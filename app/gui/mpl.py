@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
 
-from app.models.utils import Point, PointW
+from app.models.utils import PT
 from typing import List
 
 class FacilitiesCanvas(FigureCanvas):
@@ -17,19 +17,53 @@ class FacilitiesCanvas(FigureCanvas):
     '''
 
     def __init__(self, fig: Figure) -> None:
-        FigureCanvas.__init__(self, fig)
+        self.fig = fig
+        FigureCanvas.__init__(self, self.fig)
         self.setSizePolicy(qtw.QSizePolicy.MinimumExpanding, qtw.QSizePolicy.MinimumExpanding)
+        self.mpl_connect('motion_notify_event', self.mplMouseMove)
 
-    def updateCanvas(self, near: List[PointW] = [], far: List[PointW] = [], *sols) -> None:
-        x = [0, 1, 2, 3, 2, 2]
-        y = [0, 2, 4, 1, 3, 3]
+    def updateCanvas(self, near: List[PT] = [], far: List[PT] = [], *sols) -> None:
+        xnear = [ x for x, _, _, _ in near ]
+        ynear = [ y for _, y, _, _ in near ]
 
-        self.ax = self.figure.subplots()
-        self.ax.scatter(x, y)
-        self.draw()
+        xfar = [ x for x, _, _, _ in far ]
+        yfar = [ y for _, y, _, _ in far ]
+
+        ax = self.fig.gca()
+        ax.clear()
+
+        self.pcs = []
+        self.pcs.append(ax.scatter(xnear, ynear, label='Near'))
+        self.pcs.append(ax.scatter(xfar, yfar, label='Far'))
+        self.pcs.extend([ ax.scatter(x, y, label=f'Optimum {kind}') for x, y, _, kind in sols ])
+
+        self.from_who = [ near, far ]
+        self.from_who.extend([ [x] for x in sols ])
+
+        ax.legend()
+        ax.grid(True)
+
+        xsols = [ x for x, _, _, _ in sols ]
+        ysols = [ y for _, y, _, _ in sols ]
+
+        xs = xnear + xfar + xsols
+        ys = ynear + yfar + ysols
+
+        for x, y in zip(xs, ys):
+            ax.annotate(f'({x}, {y})', xy=(x + 0.1, y + 0.1))
 
     def mplMouseMove(self, event):
-        pass
+        for pathc, who in zip(self.pcs, self.from_who):
+            ocurred, ids = pathc.contains(event)
+
+            if ocurred:
+                globalPos = event.guiEvent.globalPos()
+                idx = ids['ind'][0]
+                qtw.QToolTip.showText(globalPos, f'Point from {who[idx].kind}, index = {idx}, w = {who[idx].w}')
+                break
+
+        else:
+            qtw.QToolTip.hideText()
 
 class FacilitiesToolbar(NavigationToolbar2, qtw.QToolBar):
     '''
@@ -53,3 +87,17 @@ class FacilitiesToolbar(NavigationToolbar2, qtw.QToolBar):
 
     # def set_history_buttons(self):
     #     pass
+
+if __name__ == '__main__':
+    app = qtw.QApplication([])
+    canvas = FacilitiesCanvas(Figure())
+    canvas.show()
+
+    near = [ PT(1, 1, 5, 'Near'), PT(2, 3, 7, 'Near'), PT(5, 2, 1, 'Near'), PT(3, 4, 7, 'Near') ]
+    far = [ PT(7, 3, 2, 'Far'), PT(5, 5, 4, 'Far'), PT(1, 2, 3, 'Far') ]
+    sols = [ PT(5, 7, 2, 'FastModel'), PT(9, 4, 1, 'FussyModel') ]
+
+    canvas.updateCanvas(near, far, *sols)
+
+    import sys
+    sys.exit(app.exec_())
