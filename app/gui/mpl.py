@@ -20,6 +20,10 @@ class FacilitiesCanvas(FigureCanvas):
         self.fig = fig
         FigureCanvas.__init__(self, self.fig)
         self.setSizePolicy(qtw.QSizePolicy.MinimumExpanding, qtw.QSizePolicy.MinimumExpanding)
+
+        self.pcs = []
+        self.from_who = []
+
         self.mpl_connect('motion_notify_event', self.mplMouseMove)
 
     def updateCanvas(self, near: List[PT] = [], far: List[PT] = [], *sols) -> None:
@@ -31,6 +35,9 @@ class FacilitiesCanvas(FigureCanvas):
 
         ax = self.fig.gca()
         ax.clear()
+
+        if not near and not far and not sols:
+            return
 
         self.pcs = []
         self.pcs.append(ax.scatter(xnear, ynear, label='Near'))
