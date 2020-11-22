@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
 
-from app.models.utils import PT
+from app.utils.utils import PT
 from typing import List
 
 class FacilitiesCanvas(FigureCanvas):

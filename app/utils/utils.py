@@ -1,5 +1,11 @@
 from collections import namedtuple
+from enum import Enum
 import logging
+
+class Load(Enum):
+    fromFile = 1
+    fromSample = 2
+    fromSidebar = 3
 
 PT = namedtuple('PT', ['x', 'y', 'w', 'kind'], defaults=[0, None])
 
