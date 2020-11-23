@@ -7,40 +7,11 @@ from app.gui.mpl import FacilitiesCanvas, FacilitiesToolbar
 
 from app.gui.resources import resources
 
-from app.models.simple_model import FastModel
-from app.models.fussy_model import FussyModel
+import app.models.fastmodel as FastModel
+import app.models.fussymodel as FussyModel
+import app.controller.controller as Controller
 
 from app.utils.utils import Load
-
-class ActionWidget(qtw.QWidget):
-    '''
-    Bottom widget holding action buttons
-    '''
-
-    def __init__(self) -> None:
-        qtw.QWidget.__init__(self)
-
-        self.setLayout(qtw.QHBoxLayout())
-
-        self.btnLoad = qtw.QPushButton('&Load', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
-        self.btnSave = qtw.QPushButton('&Save', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
-        self.labInfo = qtw.QLabel()
-        self.btnHelp = qtw.QPushButton('&Help', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
-        self.separator = qtw.QFrame()
-        self.separator.setFrameStyle(qtw.QFrame.VLine | qtw.QFrame.Raised)
-
-        self.layout().addWidget(self.btnLoad)
-        self.layout().addWidget(self.btnSave)
-        self.layout().addWidget(self.separator)
-        self.layout().addWidget(self.labInfo)
-        self.layout().addStretch()
-        self.layout().addWidget(self.btnHelp)
-
-        self.btnLoad.clicked.connect(self.onBtnLoad)
-
-    @qtc.Slot()
-    def onBtnLoad(self):
-        LoadDialog.getInstance(self.parent()).exec_()
 
 class TextEditor(qtw.QPlainTextEdit):
     '''
@@ -58,18 +29,13 @@ class LoadDialog(qtw.QDialog):
     choosedLoadRandom = qtc.Signal(list)
     choosedLoadSidebar = qtc.Signal(str, list)
 
-    _instance = None
-
-    @classmethod
-    def getInstance(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = cls(*args, **kwargs)
-
-        return cls._instance
-
     def __init__(self, parent=None) -> None:
         qtw.QDialog.__init__(self, parent)
 
+        self.setUI()
+        self.setConnections()
+
+    def setUI(self):
         self.setWindowTitle('Load from')
         self.setWindowModality(qtc.Qt.WindowModality.ApplicationModal)
 
@@ -79,9 +45,9 @@ class LoadDialog(qtw.QDialog):
         self.comboAction.addItem('Load from sidebar modification panel', Load.fromSidebar)
 
         self.comboModels = qtw.QComboBox()
-        self.comboModels.addItem(FastModel.__name__, [FastModel])
-        self.comboModels.addItem(FussyModel.__name__, [FussyModel])
-        self.comboModels.addItem(f'{FastModel.__name__}, {FussyModel.__name__}', [FastModel, FussyModel])
+        self.comboModels.addItem(FastModel.__repr__, [FastModel])
+        self.comboModels.addItem(FussyModel.__repr__, [FussyModel])
+        self.comboModels.addItem(f'{FastModel.__repr__}, {FussyModel.__repr__}', [FastModel, FussyModel])
 
         self.form = qtw.QFormLayout()
         self.form.addRow('Action', self.comboAction)
@@ -93,9 +59,9 @@ class LoadDialog(qtw.QDialog):
         self.form.setSizeConstraint(qtw.QLayout.SetFixedSize)
         self.setLayout(self.form)
 
+    def setConnections(self):
         self.btnBox.accepted.connect(self.accept)
         self.btnBox.rejected.connect(self.reject)
-
         self.accepted.connect(self.onAccepted)
 
     @qtc.Slot()
@@ -125,19 +91,64 @@ class CentralWidget(qtw.QWidget):
 
     def __init__(self, canvas) -> None:
         qtw.QWidget.__init__(self)
+        self.canvas = canvas
 
+        self.setUI()
+        self.setLoadDialog()
+        self.setSaveDialog()
+        self.setHelpDialog()
+        self.setConnections()
+
+    def setUI(self):
         self.setLayout(qtw.QVBoxLayout())
 
-        self.hlayout = qtw.QHBoxLayout()
-        self.hlayout.addWidget(canvas)
+        self.hboxCanvas = qtw.QHBoxLayout()
+        self.hboxCanvas.addWidget(self.canvas)
 
         self.textEditor = TextEditor()
-        self.hlayout.addWidget(self.textEditor)
+        self.hboxCanvas.addWidget(self.textEditor)
 
-        self.layout().addLayout(self.hlayout)
+        self.layout().addLayout(self.hboxCanvas)
 
-        self.actionWidget = ActionWidget()
-        self.layout().addWidget(self.actionWidget)
+        self.setHBoxActions()
+        self.layout().addLayout(self.hboxActions)
+
+    def setLoadDialog(self):
+        self.loadDialog = LoadDialog(self)
+
+        self.loadDialog.choosedLoadFile.connect(Controller.loadFile)
+        self.loadDialog.choosedLoadRandom.connect(Controller.loadRandomSample)
+        self.loadDialog.choosedLoadSidebar.connect(Controller.loadText)
+
+    def setSaveDialog(self):
+        pass
+
+    def setHelpDialog(self):
+        pass
+
+    def setHBoxActions(self):
+        self.hboxActions = qtw.QHBoxLayout()
+
+        self.btnLoad = qtw.QPushButton('&Load', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        self.btnSave = qtw.QPushButton('&Save', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        self.labInfo = qtw.QLabel()
+        self.btnHelp = qtw.QPushButton('&Help', sizePolicy=qtw.QSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.Fixed))
+        self.separator = qtw.QFrame()
+        self.separator.setFrameStyle(qtw.QFrame.VLine | qtw.QFrame.Raised)
+
+        self.hboxActions.addWidget(self.btnLoad)
+        self.hboxActions.addWidget(self.btnSave)
+        self.hboxActions.addWidget(self.separator)
+        self.hboxActions.addWidget(self.labInfo)
+        self.hboxActions.addStretch()
+        self.hboxActions.addWidget(self.btnHelp)
+
+    def setConnections(self):
+        self.btnLoad.clicked.connect(self.onBtnLoad)
+
+    @qtc.Slot()
+    def onBtnLoad(self):
+        self.loadDialog.exec_()
 
 class MainWindow(qtw.QMainWindow):
     '''
@@ -146,8 +157,11 @@ class MainWindow(qtw.QMainWindow):
 
     def __init__(self) -> None:
         qtw.QMainWindow.__init__(self)
-        self.loadCSS()
 
+        self.loadCSS()
+        self.setUI()
+
+    def setUI(self):
         self.setWindowTitle('Locating Facilities')
 
         self.canvas = FacilitiesCanvas(Figure())
@@ -157,8 +171,6 @@ class MainWindow(qtw.QMainWindow):
 
         self.addToolBar(self.toolbar)
         self.setCentralWidget(CentralWidget(self.canvas))
-
-        self.show()
 
     def loadCSS(self):
         f = qtc.QFile(':/style.css')                            
