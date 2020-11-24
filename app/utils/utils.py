@@ -1,6 +1,10 @@
 from collections import namedtuple
 from enum import Enum
 import logging
+import re
+
+PARAMS = 3
+floatRE = re.compile(r'[-+]?(\d+(\.\d*)?|\.\d+)([eE][-+]?\d+)?')
 
 class Load(Enum):
     fromFile = 1

@@ -3,24 +3,17 @@ from PySide2 import QtGui as qtg
 from PySide2 import QtCore as qtc
 
 from matplotlib.figure import Figure
-from app.gui.mpl import FacilitiesCanvas, FacilitiesToolbar
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from app.gui.mpl import FacilitiesCanvas
 
 from app.gui.resources import resources
+from app.gui.codeeditor import CodeEditor
 
 import app.models.fastmodel as FastModel
 import app.models.fussymodel as FussyModel
-import app.controller.controller as Controller
+from app.controller.controller import Controller
 
 from app.utils.utils import Load
-
-class TextEditor(qtw.QPlainTextEdit):
-    '''
-    Implements a simple text editor for displaying/editing the points
-    '''
-
-    def __init__(self) -> None:
-        qtw.QPlainTextEdit.__init__(self)
-        self.setSizePolicy(qtw.QSizePolicy.Fixed, qtw.QSizePolicy.MinimumExpanding)
 
 class LoadDialog(qtw.QDialog):
     '''Implements the load dialog'''
@@ -92,6 +85,7 @@ class CentralWidget(qtw.QWidget):
     def __init__(self, canvas) -> None:
         qtw.QWidget.__init__(self)
         self.canvas = canvas
+        self.controller = Controller()
 
         self.setUI()
         self.setLoadDialog()
@@ -103,10 +97,10 @@ class CentralWidget(qtw.QWidget):
         self.setLayout(qtw.QVBoxLayout())
 
         self.hboxCanvas = qtw.QHBoxLayout()
-        self.hboxCanvas.addWidget(self.canvas)
+        self.hboxCanvas.addWidget(self.canvas, stretch=2)
 
-        self.textEditor = TextEditor()
-        self.hboxCanvas.addWidget(self.textEditor)
+        self.textEditor = CodeEditor()
+        self.hboxCanvas.addWidget(self.textEditor, stretch=1)
 
         self.layout().addLayout(self.hboxCanvas)
 
@@ -116,9 +110,9 @@ class CentralWidget(qtw.QWidget):
     def setLoadDialog(self):
         self.loadDialog = LoadDialog(self)
 
-        self.loadDialog.choosedLoadFile.connect(Controller.loadFile)
-        self.loadDialog.choosedLoadRandom.connect(Controller.loadRandomSample)
-        self.loadDialog.choosedLoadSidebar.connect(Controller.loadText)
+        self.loadDialog.choosedLoadFile.connect(self.controller.loadFile)
+        self.loadDialog.choosedLoadRandom.connect(self.controller.loadRandomSample)
+        self.loadDialog.choosedLoadSidebar.connect(self.controller.loadText)
 
     def setSaveDialog(self):
         pass
@@ -145,10 +139,37 @@ class CentralWidget(qtw.QWidget):
 
     def setConnections(self):
         self.btnLoad.clicked.connect(self.onBtnLoad)
+        self.controller.redrawCanvas.connect(self.canvas.updateCanvas)
+        self.controller.resetLabel.connect(self.resetLabelInfo)
+        self.controller.resetTextEditor.connect(self.resetTextEditorInfo)
+        self.controller.notifyError.connect(self.displayErrorMsg)
+
+    def resetLabelInfo(self, sols, costs):
+        text = []
+
+        for s, c in zip(sols, costs):
+            text.append(f'point=({s.x}, {s.y}), cost={c} using {s.kind}')
+
+        text = 'Found: ' + ', '.join(text) + '.'
+        self.labInfo.setText(text)
+
+    def resetTextEditorInfo(self, near, far, xmin, xmax, ymin, ymax):
+        doFormat = lambda o: f'{o.x} {o.y} {o.w}'
+
+        text = '\n'.join(map(doFormat, near))
+        text += '\n*\n'
+        text += '\n'.join(map(doFormat, far))
+        text += '\n*\n'
+        text += f'{xmin} {xmax} {ymin} {ymax}'
+
+        self.textEditor.setPlainText(text)
+
+    def displayErrorMsg(self, errorText):
+        qtw.QMessageBox.critical(self, 'Error', errorText)
 
     @qtc.Slot()
     def onBtnLoad(self):
-        self.loadDialog.exec_()
+        self.loadDialog.open()
 
 class MainWindow(qtw.QMainWindow):
     '''
@@ -167,7 +188,7 @@ class MainWindow(qtw.QMainWindow):
         self.canvas = FacilitiesCanvas(Figure())
         self.canvas.updateCanvas()
 
-        self.toolbar = FacilitiesToolbar(self.canvas)
+        self.toolbar = NavigationToolbar(self.canvas, self)
 
         self.addToolBar(self.toolbar)
         self.setCentralWidget(CentralWidget(self.canvas))

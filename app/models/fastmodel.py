@@ -6,7 +6,7 @@ from collections import namedtuple
 __repr__ = 'FastModel'
 C = namedtuple('C', ['c', 'w'], defaults=[0])
 
-def fastmodel(near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: float, ymax: float):
+def optimize(near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: float, ymax: float):
     # find optimal x
     xnear = [ C(x, w) for x, _, w, _ in near ]
     xfar = [ C(x, w) for x, _, w, _ in far ]
@@ -21,7 +21,7 @@ def fastmodel(near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: flo
 
     y, cy = solvecoord(ynear, yfar, yboundaries)
 
-    return PT(x, y, kind='Fast Model'), cx + cy
+    return PT(x, y, w=0, kind='FastModel'), cx + cy
 
 def solvecoord(cnear: List[C], cfar: List[C], boundaries: List[C]) -> Tuple[float, float]:
     cnear = sorted(cnear, key=lambda x: x.c)
@@ -92,13 +92,13 @@ def arrcost(p, arr):
     return cost
 
 if __name__ == '__main__':
-    optimalpt, cost = fastmodel([PT(1, 4, w=1)], [PT(5, 1, w=1)], -5, 5, -2, 7)
+    optimalpt, cost = optimize([PT(1, 4, w=1)], [PT(5, 1, w=1)], -5, 5, -2, 7)
     print(f'pt={optimalpt}, cost={cost}')
 
     near = [PT(1, 4, w=1), PT(4, 2, w=1), PT(3, 2, w=1)]
     far = [PT(5, 1, w=1), PT(3, 7, w=1), PT(1.5, 1, w=1.5)]
     
-    optimalpt, cost = fastmodel(near, far, -8, 8, -8, 8)
+    optimalpt, cost = optimize(near, far, -8, 8, -8, 8)
     print(f'pt={optimalpt}, cost={cost}')
 
     e = []

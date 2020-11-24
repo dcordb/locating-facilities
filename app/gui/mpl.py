@@ -26,7 +26,7 @@ class FacilitiesCanvas(FigureCanvas):
 
         self.mpl_connect('motion_notify_event', self.mplMouseMove)
 
-    def updateCanvas(self, near: List[PT] = [], far: List[PT] = [], *sols) -> None:
+    def updateCanvas(self, near: List[PT] = [], far: List[PT] = [], sols: List[PT] = []) -> None:
         xnear = [ x for x, _, _, _ in near ]
         ynear = [ y for _, y, _, _ in near ]
 
@@ -35,6 +35,7 @@ class FacilitiesCanvas(FigureCanvas):
 
         ax = self.fig.gca()
         ax.clear()
+        ax.grid()
 
         if not near and not far and not sols:
             return
@@ -56,8 +57,7 @@ class FacilitiesCanvas(FigureCanvas):
         xs = xnear + xfar + xsols
         ys = ynear + yfar + ysols
 
-        for x, y in zip(xs, ys):
-            ax.annotate(f'({x}, {y})', xy=(x + 0.1, y + 0.1))
+        self.fig.canvas.draw_idle()
 
     def mplMouseMove(self, event):
         for pathc, who in zip(self.pcs, self.from_who):
@@ -72,29 +72,6 @@ class FacilitiesCanvas(FigureCanvas):
         else:
             qtw.QToolTip.hideText()
 
-class FacilitiesToolbar(NavigationToolbar2, qtw.QToolBar):
-    '''
-    Represents the toolbar to work with facilities canvas plot.
-    '''
-
-    def __init__(self, canvas) -> None:
-        qtw.QToolBar.__init__(self)
-        NavigationToolbar2.__init__(self, canvas)
-
-    # functions required by MPL to be implemented
-
-    # def set_cursor(self, cursor):
-    #     pass
-
-    # def draw_rubberband(self):
-    #     pass
-
-    # def set_message(self):
-    #     pass
-
-    # def set_history_buttons(self):
-    #     pass
-
 if __name__ == '__main__':
     app = qtw.QApplication([])
     canvas = FacilitiesCanvas(Figure())
@@ -104,7 +81,11 @@ if __name__ == '__main__':
     far = [ PT(7, 3, 2, 'Far'), PT(5, 5, 4, 'Far'), PT(1, 2, 3, 'Far') ]
     sols = [ PT(5, 7, 2, 'FastModel'), PT(9, 4, 1, 'FussyModel') ]
 
-    canvas.updateCanvas(near, far, *sols)
+    near1 = [PT(x=5, y=2, w=3, kind='Near'), PT(x=7, y=6, w=1, kind='Near'), PT(x=5, y=7, w=3, kind='Near')]
+    far1 = [PT(x=0, y=3, w=1, kind='Far'), PT(x=4, y=2, w=1, kind='Far'), PT(x=9, y=9, w=1, kind='Far'), PT(x=5, y=3, w=2, kind='Far'), PT(x=7, y=4, w=3, kind='Far')]
+    sols1 = [PT(5, 7, 0, 'FastModel')]
+
+    canvas.updateCanvas(near1, far1, *sols1)
 
     import sys
     sys.exit(app.exec_())
