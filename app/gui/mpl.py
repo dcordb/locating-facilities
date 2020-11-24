@@ -1,12 +1,7 @@
 from PySide2 import QtWidgets as qtw
-from PySide2 import QtGui as qtg
-from PySide2 import QtCore as qtc
 
 from matplotlib.backends.backend_qt5agg import FigureCanvas
-from matplotlib.backend_bases import NavigationToolbar2
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-import numpy as np
 
 from app.utils.utils import PT
 from typing import List

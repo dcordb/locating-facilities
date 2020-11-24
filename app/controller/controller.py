@@ -36,7 +36,13 @@ class Controller(qtc.QObject):
 
     def loadFile(self, file: str, models):
         with open(file, 'rb') as f:
-            near, far, xmin, xmax, ymin, ymax = pickle.load(f)
+            try:
+                obj = pickle.load(f)
+            except pickle.PickleError:
+                self.notifyError.emit(ErrorReadingFile)
+                return
+
+            near, far, xmin, xmax, ymin, ymax = obj
 
         self._update(near, far, xmin, xmax, ymin, ymax, models)
         self.resetTextEditor.emit(near, far, xmin, xmax, ymin, ymax)
