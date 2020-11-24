@@ -1,7 +1,7 @@
 from PySide2.QtCore import Slot, Qt, QRect, QSize
-from PySide2.QtGui import QColor, QPainter, QTextFormat
-from PySide2.QtWidgets import QPlainTextEdit, QWidget, QTextEdit, QSizePolicy
-
+from PySide2.QtGui import QColor, QKeySequence, QPainter, QTextFormat, QKeyEvent
+from PySide2.QtWidgets import QPlainTextEdit, QShortcut, QWidget, QTextEdit, QSizePolicy
+from app.utils.utils import SidebarPlaceholderText
 
 class LineNumberArea(QWidget):
     def __init__(self, editor):
@@ -20,6 +20,7 @@ class CodeEditor(QPlainTextEdit):
         QPlainTextEdit.__init__(self)
         self.line_number_area = LineNumberArea(self)
 
+        self.setPlaceholderText(SidebarPlaceholderText)
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
 
         self.blockCountChanged[int].connect(self.update_line_number_area_width)
@@ -28,6 +29,8 @@ class CodeEditor(QPlainTextEdit):
 
         self.update_line_number_area_width(0)
         self.highlight_current_line()
+
+        self.shortcut = QShortcut(QKeySequence('Ctrl+Shift+X'), self)
 
     def line_number_area_width(self):
         digits = 1

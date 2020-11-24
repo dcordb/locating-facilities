@@ -36,9 +36,10 @@ class Controller(qtc.QObject):
 
     def loadFile(self, file: str, models):
         with open(file, 'rb') as f:
-            near, far, xmin, xmax, ymin, ymax = pickle.load(file)
+            near, far, xmin, xmax, ymin, ymax = pickle.load(f)
 
         self._update(near, far, xmin, xmax, ymin, ymax, models)
+        self.resetTextEditor.emit(near, far, xmin, xmax, ymin, ymax)
 
     def loadRandomSample(self, models):
         n = random.randint(1, 100)
@@ -79,7 +80,7 @@ class Controller(qtc.QObject):
 
         self.resetTextEditor.emit(near, far, xmin, xmax, ymin, ymax)
 
-    def loadText(self, text: str, models):
+    def loadText(self, text: str, models, internal=False):
         lines = text.splitlines()
 
         parts = []
@@ -126,6 +127,10 @@ class Controller(qtc.QObject):
             return
 
         xmin, xmax, ymin, ymax = map(float, line)
+
+        if internal:
+            return near, far, xmin, xmax, ymin, ymax
+
         self._update(near, far, xmin, xmax, ymin, ymax, models)
 
     def _readPoints(self, lines, kind):
@@ -148,6 +153,12 @@ class Controller(qtc.QObject):
     def _isfloat(self, x):
         obj = floatRE.fullmatch(x)
         return False if obj is None else True
+
+    def saveFile(self, file, text):
+        obj = self.loadText(text, models=None, internal=True)
+
+        with open(file, 'wb') as f:
+            pickle.dump(obj, f)
 
 if __name__ == '__main__':
     text = (

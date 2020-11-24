@@ -13,7 +13,7 @@ import app.models.fastmodel as FastModel
 import app.models.fussymodel as FussyModel
 from app.controller.controller import Controller
 
-from app.utils.utils import Load
+from app.utils.utils import Load, HELP_TEXT, SidebarPlaceholderSample
 
 class LoadDialog(qtw.QDialog):
     '''Implements the load dialog'''
@@ -35,7 +35,7 @@ class LoadDialog(qtw.QDialog):
         self.comboAction = qtw.QComboBox()
         self.comboAction.addItem('Load from file', Load.fromFile)
         self.comboAction.addItem('Load random sample', Load.fromSample)
-        self.comboAction.addItem('Load from sidebar modification panel', Load.fromSidebar)
+        self.comboAction.addItem('Load from sidebar text field', Load.fromSidebar)
 
         self.comboModels = qtw.QComboBox()
         self.comboModels.addItem(FastModel.__repr__, [FastModel])
@@ -77,10 +77,27 @@ class LoadDialog(qtw.QDialog):
             text = self.parent().textEditor.toPlainText()
             self.choosedLoadSidebar.emit(text, models)
 
+class HelpDialog(qtw.QDialog):
+    def __init__(self, parent=None) -> None:
+        qtw.QDialog.__init__(self, parent)
+        self.setUI()
+
+    def setUI(self):
+        self.setWindowTitle('Help')
+        self.setLayout(qtw.QHBoxLayout())
+
+        self.label = qtw.QLabel(HELP_TEXT)
+        self.label.setTextFormat(qtc.Qt.TextFormat.MarkdownText)
+
+        self.layout().addWidget(self.label)
+        self.layout().setSizeConstraint(qtw.QLayout.SetFixedSize)
+
 class CentralWidget(qtw.QWidget):
     '''
     Central widget formed by a canvas and an action widget
     '''
+
+    saveDialogExecuted = qtc.Signal(str, str)
 
     def __init__(self, canvas) -> None:
         qtw.QWidget.__init__(self)
@@ -100,6 +117,9 @@ class CentralWidget(qtw.QWidget):
         self.hboxCanvas.addWidget(self.canvas, stretch=2)
 
         self.textEditor = CodeEditor()
+        self.textEditor.setFocusPolicy(qtc.Qt.StrongFocus)
+        self.textEditor.setFocus()
+
         self.hboxCanvas.addWidget(self.textEditor, stretch=1)
 
         self.layout().addLayout(self.hboxCanvas)
@@ -115,10 +135,10 @@ class CentralWidget(qtw.QWidget):
         self.loadDialog.choosedLoadSidebar.connect(self.controller.loadText)
 
     def setSaveDialog(self):
-        pass
+        self.saveDialogExecuted.connect(self.controller.saveFile)
 
     def setHelpDialog(self):
-        pass
+        self.helpDialog = HelpDialog(self)
 
     def setHBoxActions(self):
         self.hboxActions = qtw.QHBoxLayout()
@@ -139,6 +159,10 @@ class CentralWidget(qtw.QWidget):
 
     def setConnections(self):
         self.btnLoad.clicked.connect(self.onBtnLoad)
+        self.btnSave.clicked.connect(self.onBtnSave)
+        self.btnHelp.clicked.connect(self.onBtnHelp)
+
+        self.textEditor.shortcut.activated.connect(self.pressedTextShortcut)
         self.controller.redrawCanvas.connect(self.canvas.updateCanvas)
         self.controller.resetLabel.connect(self.resetLabelInfo)
         self.controller.resetTextEditor.connect(self.resetTextEditorInfo)
@@ -170,6 +194,29 @@ class CentralWidget(qtw.QWidget):
     @qtc.Slot()
     def onBtnLoad(self):
         self.loadDialog.open()
+
+    @qtc.Slot()
+    def onBtnSave(self):
+        filepath, _ = qtw.QFileDialog.getSaveFileName(self)
+
+        if not filepath:
+            return
+
+        self.saveDialogExecuted.emit(filepath, self.textEditor.toPlainText())
+
+    @qtc.Slot()
+    def onBtnHelp(self):
+        self.helpDialog.open()
+    
+    @qtc.Slot()
+    def pressedTextShortcut(self):
+        ptext = self.textEditor.toPlainText()
+        ctext = ptext or SidebarPlaceholderSample
+
+        self.controller.loadText(ctext, [FastModel, FussyModel])
+
+        if not ptext:
+            self.textEditor.setPlainText(ctext)
 
 class MainWindow(qtw.QMainWindow):
     '''
