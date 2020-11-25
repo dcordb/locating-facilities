@@ -1,0 +1,53 @@
+\subsection{FastModel}
+
+\newcommand{\suma}[1]{ \sum_{i = 1}^{ \abs{#1} } }
+
+\begin{flalign*}
+    & \min f_A(X, Y) - f_B(X, Y) &
+\end{flalign*}
+Sujeto a:
+\begin{eqnarray*}
+    f_A(X, Y) &=& \suma{A} w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y}\right] \\
+    f_B(X, Y) &=& \suma{B} w(B_i) \cdot \left[ \abs{X(B_i) - X} + \abs{Y(B_i) - Y}\right] \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía'' de las instalaciones al punto solución.
+
+Resulta que este modelo puede ser resuelto sin usar Simplex. Más aún, podemos decir que siempre existe un punto de solución óptimo cuyas coordenadas están entre las coordenadas de las instalaciones originales. A continuación lo explicamos.
+
+\subsubsection{Separando coordenadas}
+
+Vamos a separar las coordenadas en esa sumatoria. Efectivamente, la coordenada $x$ es independiente de la $y$. Nos queda:
+
+\begin{eqnarray*}
+    S_X &=& \suma{A} w(A_i) \cdot \abs{X(A_i) - X} - \suma{B} w(B_i) \cdot \abs{X(B_i) - X} \\
+    S_Y &=& \suma{A} w(A_i) \cdot \abs{Y(A_i) - Y} - \suma{B} w(B_i) \cdot \abs{Y(B_i) - Y} \\
+\end{eqnarray*}
+
+teniendo en cuenta que queremos minimizar $S_X + S_Y$, que lo logramos minimizando cada término por separado.
+
+Vamos a resolver solo la coordenada $x$, de forma similar se puede resolver la $y$.
+
+\subsubsection{Hallando el óptimo}
+
+Queremos minimizar $S_X$, para esto supongamos que $X$ es la solución y ordenemos de forma no decreciente los conjuntos $A$ y $B$ por su coordenada $X$. Centrémonos ahora en el miembro izquierdo de $S_X$, denotémolos como $L$ y al derecho como $R$.
+
+Definimos $p$ como la menor posición $i$ $(1 \le i \le |A|)$ tal que $X(A_i) > X$. Entonces se cumple que:
+
+\begin{eqnarray*}
+    L_1 &=& X \cdot (w(A_1) + \ldots + w(A_{p-1})) - X(A_1) \cdot w(A_1) - \ldots - X(A_{p-1}) \cdot w(A_{p-1}) \\
+    L_2 &=& -X \cdot (w(A_p) + \ldots + w(A_{\abs{A}})) + X(A_p) \cdot w(A_p) + \ldots + X(A_{\abs{A}}) \cdot w(A_{\abs{A}}) \\
+    L &=& L_1 + L_2
+\end{eqnarray*}
+
+En otras palabras, las coordenadas $x$ de las instalaciones $i$ desde $1$ hasta $p$ son todas menores o iguales a $X$ y el resto son mayores. Por lo que podemos quitarnos el valor absoluto. Para $R$ nos queda algo similar.
+
+Lo importante acá es notar que tanto $L$ como $R$ son funciones lineales con variable $X$, y por tanto su suma $S_X$ también lo es.
+
+Ahora estamos en condiciones de concluir que $X$ debe pertenecer a las $x$'s originales (o $x_1, x_2$ que son los ``bordes'' del conjunto solución para esa coordenada).
+
+Supongamos que no, entonces existen dos coordenadas que pertenecen a las originales tal que $X$ está entre ellas, digamos que $s$ y $t$ $(s \le X \le t)$, pero como $S_X$ es una función lineal entonces claramente su mínimo se alcanza en $s$ o en $t$. Por lo que se cumple que $X$ pertenece a las coordenadas $x$'s originales (o a los ``bordes'' $x_1$ y $x_2$).
+
+Ahora solo tenemos que fijar un $X$, hay $O(|A| + |B|)$ de ellos, y hallar $L$ y $R$. Dado un $X$ fijo podemos hallar el costo correspondiente en $O(\log n)$, porque solo tenemos que buscar $p$ con una búsqueda binaria; y para hallar el costo podemos precalcular sumas acumulativas que nos van a permitir hallar la suma en un rango en $O(1)$. \footnote{Más detalles sobre esto se pueden ver en el código.} Por lo que podemos resolver la formulación dada en $O(n \log n)$.
