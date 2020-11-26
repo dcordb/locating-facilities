@@ -72,7 +72,7 @@ En el segundo modelo al quitarle los valores absolutos nos queda:
 \end{flalign*}
 Sujeto a:
 \begin{eqnarray*}
-    Z2 &=& t_1 + t_2 + t_3 + t_4 \\
+    Z_2 &=& t_1 + t_2 + t_3 + t_4 \\
     t_1 &\ge& X - xca \\
     t_1 &\ge& xca - X \\
     t_2 &\ge& Y - yca \\
@@ -94,9 +94,9 @@ En \cite{Paper} definen los objetivos difusos de un problema de optimización co
 \begin{equation}
     \mu_k (Z^k(X, Y)) = 
         \begin{cases}
-            1   & \text{if} \; Z^k(X, Y) \le L^k \\[4pt]
-            \displaystyle \frac{ U^k - Z^k(X, Y) }{ U^k - L^k }  & \text{if} \; L^k \le Z^k(X, Y) \le U^k \\[7pt]
-            0   & \text{if} \; Z^k(X, Y) \ge U^k
+            1   & \text{si} \; Z^k(X, Y) \le L^k \\[4pt]
+            \displaystyle \frac{ U^k - Z^k(X, Y) }{ U^k - L^k }  & \text{si} \; L^k \le Z^k(X, Y) \le U^k \\[7pt]
+            0   & \text{si} \; Z^k(X, Y) \ge U^k
         \end{cases} \label{eq:mu}
 \end{equation}
 
