@@ -9,6 +9,7 @@ nav:
     - models: api/models.md
     - gui: api/gui.md
     - controller: api/controller.md
+    - utils: api/utils.md
 
 repo_url: https://github.com/dcordb/locating-facilities
 
@@ -24,7 +25,10 @@ plugins:
             show_source: true
             show_if_no_docstring: true
             show_object_full_path: false
-            show_root_toc_entry: false
+            show_root_toc_entry: true
+            show_root_full_path: false
+            group_by_category: false
+            show_category_heading: false
           setup_commands:
             - import sys
             - from unittest.mock import MagicMock as mock

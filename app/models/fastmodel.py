@@ -6,7 +6,21 @@ from collections import namedtuple
 __repr__ = 'FastModel'
 C = namedtuple('C', ['c', 'w'], defaults=[0])
 
-def optimize(near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: float, ymax: float):
+def optimize(near: List[PT], far: List[PT], xmin: float, xmax: float, ymin: float, ymax: float) -> Tuple[PT, float]:
+    '''FastModel optimize function
+
+    Args:
+        near: set of points we want to get close to.
+        far: set of points we want to get far from.
+        xmin: lower left `x` coordinate of the solution rectangle.
+        xmax: lower right `x` coordinate of the solution rectangle.
+        ymin: upper left `x` coordinate of the solution rectangle.
+        ymax: upper right `x` coordinate of the solution rectangle.
+    
+    Returns:
+        A tuple containing the point and the value of the objective function.
+    '''
+    
     # find optimal x
     xnear = [ C(x, w) for x, _, w, _ in near ]
     xfar = [ C(x, w) for x, _, w, _ in far ]
