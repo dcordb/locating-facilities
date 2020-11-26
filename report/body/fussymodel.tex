@@ -3,23 +3,45 @@
 
 \begin{flalign}
     &\min f_A(X, Y)& \label{eq:1} \\
-    &\max f_B(X, Y)& \label{eq:2}
+    &\min f_B(X, Y)& \label{eq:2}
 \end{flalign}
 Sujeto a:
-\begin{eqnarray*}
-    f_A(X, Y) &=& \max_{1 \le i \le \abs{A}} \left\{ w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y}  \right] \right\} \\
-    f_B(X, Y) &=& \min_{1 \le j \le \abs{B}} \left\{ w(B_i) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y}  \right] \right\} \\
-    x_1 \le &X& \le x_2 \\
-    y_1 \le &Y& \le y_2
-\end{eqnarray*}
+\begin{eqnarray}
+    f_A(X, Y) &=& \max_{1 \le i \le \abs{A}} \left\{ w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y}  \right] \right\} \nonumber \\
+    f_B(X, Y) &=& \abs{X - xca} + \abs{Y - yca} + \abs{X - xcb} + \abs{Y - ycb} \nonumber \\
+    (xca, yca) &=& \displaystyle \frac{\sum_{i=1}^{\abs{A}} w(A_i) \cdot (X(A_i), Y(A_i))}{\abs{A}} \label{eq:cma} \\
+    (xcb, ycb) &=& \displaystyle \frac{\sum_{j=1}^{\abs{B}} w(B_j) \cdot (X(B_j), Y(B_j))}{\abs{B}} \label{eq:cmb} \\
+    x_1 \le &X& \le x_2 \nonumber \\
+    y_1 \le &Y& \le y_2 \nonumber
+\end{eqnarray}
+
+Notar que \eqref{eq:cma} y \eqref{eq:cmb} son las coordenadas de los centroides de $A$ y $B$ respectivamente.
 
 En este modelo tenemos dos objetivos que queremos satisfacer a la vez. Para esto usamos \href{https://es.wikipedia.org/wiki/Conjunto_difuso}{Teoría de conjuntos difusos} y nos basamos en un resultado obtenido en \cite{Paper}.
 
 La idea general es resolver \eqref{eq:1} y \eqref{eq:2} por separado y luego combinar ambas soluciones en un modelo nuevo que al resolverlo nos dará la solución del modelo original con dos objetivos.
 
+\subsection{Camino a la solución}
+
+En \cite{Paper} exponen un esquema de solución para un problema de optimización con $k$ objetivos. Seguimos ese esquema a continuación.
+
+Denotemos a \eqref{eq:1} como $Z_1$ y a \eqref{eq:2} como $Z_2$. Entonces el primer modelo lo podemos escribir como:
+
+\begin{flalign*}
+    & \min Z_1 &
+\end{flalign*}
+Sujeto a:
+\begin{eqnarray*}
+    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+Es decir, $Z_1$ es el máximo que queremos minimizar, por tanto las distancias desde $(X, Y)$ hasta $(X(A_i), Y(A_i))$ tienen que ser menores o iguales a $Z_1$. Denotemos a la solución de este modelo como $(X_1, Y_1)$.
+
 \subsection{Sobre la suma de valores absolutos como restricción}
 
-En los modelos siguientes existen restricciones que tienen una suma de dos valores absolutos, por ejemplo:
+El modelo anterior tiene restricciones que tienen una suma de dos valores absolutos:
 
 \begin{equation*}
     w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] \le Z_1  \quad \forall i \, (1 \le i \le \abs{A})
@@ -42,37 +64,28 @@ Y por tanto añadimos las siguientes restricciones:
     w(A_i) \cdot \left( p_i + q_i \right) &\le& Z_1
 \end{eqnarray*}
 
-\subsection{Camino a la solución}
-
-En \cite{Paper} exponen un esquema de solución para un problema de optimización con $k$ objetivos. Seguimos ese esquema a continuación.
-
-Denotemos a \eqref{eq:1} como $Z_1$ y a \eqref{eq:2} como $Z_2$. Entonces el primer modelo lo podemos escribir como:
+\newpage
+En el segundo modelo al quitarle los valores absolutos nos queda:
 
 \begin{flalign*}
-    & \min Z_1 &
+    & \min Z_2 &
 \end{flalign*}
 Sujeto a:
 \begin{eqnarray*}
-    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \\
+    Z2 &=& t_1 + t_2 + t_3 + t_4 \\
+    t_1 &\ge& X - xca \\
+    t_1 &\ge& xca - X \\
+    t_2 &\ge& Y - yca \\
+    t_2 &\ge& yca - Y \\
+    t_3 &\ge& X - xcb \\
+    t_3 &\ge& xcb - X \\
+    t_4 &\ge& Y - ycb \\
+    t_4 &\ge& ycb - Y \\ 
     x_1 \le &X& \le x_2 \\
     y_1 \le &Y& \le y_2
 \end{eqnarray*}
 
-Es decir, $Z_1$ es el máximo que queremos minimizar, por tanto las distancias desde $(X, Y)$ hasta $(X(A_i), Y(A_i))$ tienen que ser menores o iguales a $Z_1$. Denotemos a la solución de este modelo como $(X_1, Y_1)$.
-
-En el segundo modelo pasa algo similar:
-
-\begin{flalign*}
-    & \min -Z_2 &
-\end{flalign*}
-Sujeto a:
-\begin{eqnarray*}
-    w(B_j) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y} \right] &\ge& Z_2  \quad \forall j \, (1 \le j \le \abs{B}) \\
-    x_1 \le &X& \le x_2 \\
-    y_1 \le &Y& \le y_2
-\end{eqnarray*}
-
-Ahora $Z_2$ es el mínimo que queremos maximizar, por lo que la desigualdad que lo incluye cambia. Notar que pusimos $\min -Z_2$ ya que queremos que ambas funciones objetivos sean de mínimo. Denotemos a la solución de este modelo como $(X_2, Y_2)$.
+Denotemos a la solución de este modelo como $(X_2, Y_2)$.
 
 \subsection{Objetivos Difusos}
 
@@ -102,13 +115,15 @@ Luego teniendo en cuenta los $L^k, U^k$ y \eqref{eq:mu} estamos en condiciones d
     & \max \lambda &
 \end{flalign*}
 Sujeto a:
-\begin{eqnarray*}
-    \lambda &\le& \mu_1(Z_1) \\
-    \lambda &\le& \mu_2(Z_2) \\
-    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \\
-    w(B_j) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y} \right] &\ge& Z_2  \quad \forall j \, (1 \le j \le \abs{B}) \\
-    x_1 \le &X& \le x_2 \\
-    y_1 \le &Y& \le y_2
-\end{eqnarray*}
+\begin{eqnarray}
+    \lambda &\le& \mu_1(Z_1) \nonumber \\
+    \lambda &\le& \mu_2(Z_2) \nonumber \\
+    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \nonumber \\
+    \abs{X - xca} + \abs{Y - yca} + \abs{X - xcb} + \abs{Y - ycb} &=& Z_2 \label{eq:acc} \\
+    x_1 \le &X& \le x_2 \nonumber \\
+    y_1 \le &Y& \le y_2 \nonumber
+\end{eqnarray}
+
+Ponemos \eqref{eq:acc} con valores absolutos para ahorrar en espacio.
 
 Notar que lo que planteamos acá no es más que maximizar el mínimo de las funciones de pertenencia de cada uno de los objetivos. La solución $(X, Y)$ de este modelo lineal sería la solución del modelo inicialmente planteado. 
