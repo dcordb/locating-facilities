@@ -17,6 +17,33 @@ En este modelo tenemos dos objetivos que queremos satisfacer a la vez. Para esto
 
 La idea general es resolver \eqref{eq:1} y \eqref{eq:2} por separado y luego combinar ambas soluciones en un modelo nuevo que al resolverlo nos dará la solución del modelo original con dos objetivos.
 
+\subsection{Sobre la suma de valores absolutos como restricción}
+
+En los modelos siguientes existen restricciones que tienen una suma de dos valores absolutos, por ejemplo:
+
+\begin{equation*}
+    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] \le Z_1  \quad \forall i \, (1 \le i \le \abs{A})
+\end{equation*}
+
+Esto lo podemos resolver si introducimos variables $p_i, q_i$ tal que:
+
+\begin{eqnarray*}
+    p_i &\ge& \abs{X(A_i) - X} \\
+    q_i &\ge& \abs{Y(A_i) - Y}
+\end{eqnarray*}
+
+Y por tanto añadimos las siguientes restricciones:
+
+\begin{eqnarray*}
+    p_i &\ge& X(A_i) - X \\
+    p_i &\ge& X - X(A_i) \\
+    q_i &\ge& Y(A_i) - Y \\
+    q_i &\ge& Y - Y(A_i) \\
+    w(A_i) \cdot \left( p_i + q_i \right) &\le& Z_1
+\end{eqnarray*}
+
+\subsection{Camino a la solución}
+
 En \cite{Paper} exponen un esquema de solución para un problema de optimización con $k$ objetivos. Seguimos ese esquema a continuación.
 
 Denotemos a \eqref{eq:1} como $Z_1$ y a \eqref{eq:2} como $Z_2$. Entonces el primer modelo lo podemos escribir como:
@@ -31,9 +58,7 @@ Sujeto a:
     y_1 \le &Y& \le y_2
 \end{eqnarray*}
 
-Es decir, $Z_1$ es el máximo que queremos minimizar, por tanto las distancias desde $(X, Y)$ hasta $(X(A_i), Y(A_i))$ tienen que ser menores o iguales a $Z_1$. Este es un modelo lineal que se resuelve sin problemas con Simplex; denotemos a su solución como $(X_1, Y_1)$.
-
-\newpage
+Es decir, $Z_1$ es el máximo que queremos minimizar, por tanto las distancias desde $(X, Y)$ hasta $(X(A_i), Y(A_i))$ tienen que ser menores o iguales a $Z_1$. Denotemos a la solución de este modelo como $(X_1, Y_1)$.
 
 En el segundo modelo pasa algo similar:
 
@@ -47,7 +72,9 @@ Sujeto a:
     y_1 \le &Y& \le y_2
 \end{eqnarray*}
 
-Ahora $Z_2$ es el mínimo que queremos maximizar, por lo que la desigualdad que lo incluye cambia. Notar que pusimos $\min -Z_2$ ya que queremos que ambas funciones objetivos sean de mínimo. Este es un modelo lineal que se resuelve sin problemas con Simplex; denotemos a su solución como $(X_2, Y_2)$.
+Ahora $Z_2$ es el mínimo que queremos maximizar, por lo que la desigualdad que lo incluye cambia. Notar que pusimos $\min -Z_2$ ya que queremos que ambas funciones objetivos sean de mínimo. Denotemos a la solución de este modelo como $(X_2, Y_2)$.
+
+\subsection{Objetivos Difusos}
 
 En \cite{Paper} definen los objetivos difusos de un problema de optimización con $k$ objetivos con la siguiente función de pertenencia:
 
@@ -70,8 +97,6 @@ Donde $U^k$ es la peor cota superior del objetivo $k$ y $L^k$ es la mejor cota i
 Básicamente, $\mu$ le asigna un valor real entre $0$ y $1$ a cada objetivo, que dice que tan bueno es, o dicho de otra forma, que tanto pertenece ese objetivo al conjunto óptimo.
 
 Luego teniendo en cuenta los $L^k, U^k$ y \eqref{eq:mu} estamos en condiciones de formular el modelo final, guiándonos por \cite{Paper}:
-
-\newpage
 
 \begin{flalign*}
     & \max \lambda &
