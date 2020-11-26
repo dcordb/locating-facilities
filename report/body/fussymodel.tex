@@ -1,1 +1,89 @@
+\newpage
 \subsection{FussyModel}
+
+\begin{flalign}
+    &\min f_A(X, Y)& \label{eq:1} \\
+    &\max f_B(X, Y)& \label{eq:2}
+\end{flalign}
+Sujeto a:
+\begin{eqnarray*}
+    f_A(X, Y) &=& \max_{1 \le i \le \abs{A}} \left\{ w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y}  \right] \right\} \\
+    f_B(X, Y) &=& \min_{1 \le j \le \abs{B}} \left\{ w(B_i) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y}  \right] \right\} \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+En este modelo tenemos dos objetivos que queremos satisfacer a la vez. Para esto usamos \href{https://es.wikipedia.org/wiki/Conjunto_difuso}{Teoría de conjuntos difusos} y nos basamos en un resultado obtenido en \cite{Paper}.
+
+La idea general es resolver \eqref{eq:1} y \eqref{eq:2} por separado y luego combinar ambas soluciones en un modelo nuevo que al resolverlo nos dará la solución del modelo original con dos objetivos.
+
+En \cite{Paper} exponen un esquema de solución para un problema de optimización con $k$ objetivos. Seguimos ese esquema a continuación.
+
+Denotemos a \eqref{eq:1} como $Z_1$ y a \eqref{eq:2} como $Z_2$. Entonces el primer modelo lo podemos escribir como:
+
+\begin{flalign*}
+    & \min Z_1 &
+\end{flalign*}
+Sujeto a:
+\begin{eqnarray*}
+    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+Es decir, $Z_1$ es el máximo que queremos minimizar, por tanto las distancias desde $(X, Y)$ hasta $(X(A_i), Y(A_i))$ tienen que ser menores o iguales a $Z_1$. Este es un modelo lineal que se resuelve sin problemas con Simplex; denotemos a su solución como $(X_1, Y_1)$.
+
+\newpage
+
+En el segundo modelo pasa algo similar:
+
+\begin{flalign*}
+    & \min -Z_2 &
+\end{flalign*}
+Sujeto a:
+\begin{eqnarray*}
+    w(B_j) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y} \right] &\ge& Z_2  \quad \forall j \, (1 \le j \le \abs{B}) \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+Ahora $Z_2$ es el mínimo que queremos maximizar, por lo que la desigualdad que lo incluye cambia. Notar que pusimos $\min -Z_2$ ya que queremos que ambas funciones objetivos sean de mínimo. Este es un modelo lineal que se resuelve sin problemas con Simplex; denotemos a su solución como $(X_2, Y_2)$.
+
+En \cite{Paper} definen los objetivos difusos de un problema de optimización con $k$ objetivos con la siguiente función de pertenencia:
+
+\begin{equation}
+    \mu_k (Z^k(X, Y)) = 
+        \begin{cases}
+            1   & \text{if} \; Z^k(X, Y) \le L^k \\[4pt]
+            \displaystyle \frac{ U^k - Z^k(X, Y) }{ U^k - L^k }  & \text{if} \; L^k \le Z^k(X, Y) \le U^k \\[7pt]
+            0   & \text{if} \; Z^k(X, Y) \ge U^k
+        \end{cases} \label{eq:mu}
+\end{equation}
+
+Donde $U^k$ es la peor cota superior del objetivo $k$ y $L^k$ es la mejor cota inferior del objetivo $k$. En nuestro problema nos quedaría:
+
+\begin{eqnarray*}
+    U^1 = \max \left\{ Z^1(X_1, Y_1), Z^1(X_2, Y_2)  \right\} ; &\;& L^1 = Z^1(X_1, Y_1) \\
+    U^2 = \max \left\{ Z^2(X_1, Y_1), Z^2(X_2, Y_2)  \right\} ; &\;& L^2 = Z^2(X_2, Y_2) \\
+\end{eqnarray*}
+
+Básicamente, $\mu$ le asigna un valor real entre $0$ y $1$ a cada objetivo, que dice que tan bueno es, o dicho de otra forma, que tanto pertenece ese objetivo al conjunto óptimo.
+
+Luego teniendo en cuenta los $L^k, U^k$ y \eqref{eq:mu} estamos en condiciones de formular el modelo final, guiándonos por \cite{Paper}:
+
+\newpage
+
+\begin{flalign*}
+    & \max \lambda &
+\end{flalign*}
+Sujeto a:
+\begin{eqnarray*}
+    \lambda &\le& \mu_1(Z_1) \\
+    \lambda &\le& \mu_2(Z_2) \\
+    w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y} \right] &\le& Z_1  \quad \forall i \, (1 \le i \le \abs{A}) \\
+    w(B_j) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y} \right] &\ge& Z_2  \quad \forall j \, (1 \le j \le \abs{B}) \\
+    x_1 \le &X& \le x_2 \\
+    y_1 \le &Y& \le y_2
+\end{eqnarray*}
+
+Notar que lo que planteamos acá no es más que maximizar el mínimo de las funciones de pertenencia de cada uno de los objetivos. La solución $(X, Y)$ de este modelo lineal sería la solución del modelo inicialmente planteado. 

@@ -3,25 +3,27 @@
 En el siguiente reporte exponemos la solución a un problema de Modelos de Optimización:
 
 \begin{itemize}[label=\textbullet]
-    \item Dado dos conjuntos instalaciones \footnote{Por ejemplo: edificios, casas, etc.} se desea seleccionar un lugar para crear una nueva instalación de forma tal que esté ``cerca'' del primer conjunto y ``lejos'' del segundo.
+    \item Dado dos conjuntos de instalaciones \footnote{Por ejemplo: edificios, casas, etc.} se desea seleccionar un lugar para crear una nueva instalación de forma tal que esté ``cerca'' del primer conjunto y ``lejos'' del segundo.
 \end{itemize}
+
+\subsection{Formalizando el problema}
 
 El problema tiene una definición informal, especialmente por el uso de palabras como cerca y lejos, por lo que es necesario hacer algunas consideraciones:
 
 \begin{enumerate}
-    \item Vamos a pensar en cada instalación $i$ como un punto $(x_i, y_i)$ en el plano.
+    \item Consideremos a cada instalación $i$ como un punto $(x_i, y_i)$ en el plano.
     \item Denotemos con $A$ al conjunto del cual se quiere estar cerca.
     \item Denotemos con $B$ al conjunto del cual se quiere estar lejos.
     \item Denotemos a la $x$ del $i$-ésimo punto de un conjunto $S$ de puntos con $X(S_i)$ y a la $y$ con $Y(S_i)$.
     \item Denotemos con $(X, Y)$ al punto solución.
     \item Definamos como $f_A(X, Y)$ al valor de cercanía del punto solución al conjunto $A$.
     \item Definamos como $f_B(X, Y)$ al valor de lejanía del punto solución al conjunto $B$.
-    \item Definamos como $x_1, x_2, y_1, y_2$ como el rectángulo (cuyo punto inferior izquierdo es $(x_1, y_1)$ y superior derecho $(x_2, y_2)$) en el cual se puede encontrar el punto solución.
-    \item Además, de cada instalación $i$ tenemos un peso $w_i (w_i \ge 1)$ que tiene asignado, que influye que tanto la solución se acerque o aleje de esta.
+    \item Definamos como $x_1, x_2, y_1, y_2$ al rectángulo (cuyo punto inferior izquierdo es $(x_1, y_1)$ y superior derecho $(x_2, y_2)$) en el cual se puede encontrar el punto solución.
+    \item Además, de cada instalación $i$ tenemos un peso $w_i \, (w_i \ge 1)$ que tiene asignado, que influye que tanto la solución se acerque o aleje de esta.
 \end{enumerate}
 
-Ahora nuestro problema es buscar un punto $(X, Y)$ tal que maximice $f_A(X, Y)$ y minimice $f_B(X, Y)$. A continuación proponemos dos modelos para la solución de este problema.
+Ahora nuestro problema es buscar un punto $(X, Y)$ tal que maximice $f_A(X, Y)$ y maximice $f_B(X, Y)$. A continuación proponemos dos modelos para la solución de este problema.
 
 \subsection{Sobre la aplicación}
 
-Debido a la naturaleza geométrica del problema en cuestión, desarrollamos una aplicación visual que permite mostrar la localización de cada instalación en el plano. La aplicación fue desarrollada en Python3 con el uso de las librerías Numpy, Matplotlib y PySide2 (Qt).
+Debido a la naturaleza geométrica del problema en cuestión, desarrollamos una aplicación visual que permite mostrar la localización de cada instalación en el plano. La aplicación fue desarrollada en Python3 con el uso de las librerías Numpy, Matplotlib, PuLP y PySide2 (Qt).
