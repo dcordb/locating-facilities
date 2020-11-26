@@ -1,7 +1,16 @@
-site_name: Locating Facilities Doc
+site_name: Locating Facilities Documentation
 
 theme:
   name: "material"
+
+nav:
+  - Home: index.md
+  - Api Reference:
+    - models: api/models.md
+    - gui: api/gui.md
+    - controller: api/controller.md
+
+repo_url: https://github.com/dcordb/locating-facilities
 
 plugins:
   - search
@@ -9,15 +18,24 @@ plugins:
       default_handler: python
       handlers:
         python:
+          selection:
+            filters: ['!^_', '^__init__$']
           rendering:
-            show_source: false  
-      custom_templates: templates
+            show_source: true
+            show_if_no_docstring: true
+            show_object_full_path: false
+            show_root_toc_entry: false
+          setup_commands:
+            - import sys
+            - from unittest.mock import MagicMock as mock
+            - sys.modules['Shiboken'] = mock()
       watch:
         - app
 
 markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
+  - markdown_include.include
 
 extra_javascript:
   - docs/javascripts/maths.js
