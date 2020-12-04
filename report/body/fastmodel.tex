@@ -2,9 +2,10 @@
 
 \newcommand{\suma}[2]{ \sum_{#1 = 1}^{ \abs{#2} } }
 
-\begin{flalign*}
+\begin{flalign}
     & \min f_A(X, Y) - f_B(X, Y) &
-\end{flalign*}
+    \label{fastmodel}
+\end{flalign}
 Sujeto a:
 \begin{eqnarray*}
     f_A(X, Y) &=& \suma{i}{A} w(A_i) \cdot \left[ \abs{X(A_i) - X} + \abs{Y(A_i) - Y}\right] \\
@@ -15,24 +16,116 @@ Sujeto a:
 
 Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía'' de las instalaciones al punto solución.
 
-Resulta que este modelo puede ser resuelto sin usar Simplex. Más aún, podemos decir que siempre existe un punto de solución óptimo cuyas coordenadas están entre las coordenadas de las instalaciones originales. A continuación lo explicamos.
+\subsection{Resolviendo FastModel}
 
-\subsubsection{Separando coordenadas}
+\begin{definition}
+    Podemos minimizar \eqref{fastmodel} minimizando los términos con $X$ y con $Y$ de forma independiente.
+    \label{def_ind}
+\end{definition}
 
-Vamos a separar las coordenadas en esa sumatoria. Efectivamente, la coordenada $x$ es independiente de la $y$. Nos queda:
+\begin{proof}
+    Si separamos por coordenadas en \eqref{fastmodel}, nos queda:
 
-\begin{eqnarray*}
-    S_X &=& \suma{i}{A} w(A_i) \cdot \abs{X(A_i) - X} - \suma{j}{B} w(B_j) \cdot \abs{X(B_j) - X} \\
-    S_Y &=& \suma{i}{A} w(A_i) \cdot \abs{Y(A_i) - Y} - \suma{j}{B} w(B_j) \cdot \abs{Y(B_j) - Y} \\
-\end{eqnarray*}
+    \begin{eqnarray*}
+        S_1(X) &=& \suma{i}{A} w(A_i) \cdot \abs{X(A_i) - X} - \suma{j}{B} w(B_j) \cdot \abs{X(B_j) - X} \\
+        S_2(Y) &=& \suma{i}{A} w(A_i) \cdot \abs{Y(A_i) - Y} - \suma{j}{B} w(B_j) \cdot \abs{Y(B_j) - Y} \\
+    \end{eqnarray*}
 
-teniendo en cuenta que queremos minimizar $S_X + S_Y$, que lo logramos minimizando cada término por separado.
+    por tanto \eqref{fastmodel} equivale a $\min \{ S_1(X) + S_2(Y) \}$, que lo logramos minimizando cada término por separado.
+    \renewcommand{\qedsymbol}{}
+\end{proof}
 
-Vamos a resolver solo la coordenada $x$, de forma similar se puede resolver la $y$.
+\begin{definition}
+    Para todo $i, j$ $(1 \le i \le \abs{A}, 1 \le j \le \abs{B})$:
+
+    \begin{enumerate}
+        \item Un conjunto $T_x$ es de puntos originales para la coordenada $x$ si $T_x = \{ X(A_i), X(B_j), x_1, x_2 \}$.
+        \item Un conjunto $T_y$ es de puntos originales para la coordenada $y$ si $T_y = \{ Y(A_i), Y(B_j), y_1, y_2 \}$.
+    \end{enumerate}
+
+\end{definition}
+
+\begin{definition}
+    Para todo conjunto $S$ tal que $S' = \{ -\infty, \infty \} \cup S$ y $x \in \R$ definimos como:
+
+    \begin{enumerate}
+        \item $\inf (S, x)$ al mayor $y \in S'$ tal que $y \le x$.
+        \item $\sup (S, x)$ al menor $y \in S'$ tal que $y \ge x$.
+    \end{enumerate}
+\end{definition}
+
+\begin{collorary}
+    No existe $t \in S \cap \left[ \inf(S, x), \sup (S, x) \right]$ tal que $t \neq x$.
+    \label{C:1}
+\end{collorary}
+
+\begin{proof}
+    La demostración es directa por la definición de ínfimo y supremo dada.
+\end{proof}
+
+\begin{definition}
+    Para todo $x \in I$ donde $I = \left[\inf(T_x, x), \sup (T_x, x) \right]$ se cumple que $S_1(x)$ es una función lineal que depende de $x$.
+    \label{def_fnok}
+\end{definition}
+
+\begin{proof}
+    \hfill
+
+    Denotemos a:
+
+    \begin{itemize}[label=\textbullet]
+        \item $m(x) = \{ X(A_i) \mid X(A_i) < x \} \cup \{ X(B_j) \mid X(B_j) < x \}$
+        \item $M(x) = \{ X(A_i) \mid X(A_i) > x \} \cup \{ X(B_j) \mid X(B_j) > x \}$
+    \end{itemize}
+
+    Por el Colorario~\ref{C:1} sabemos que $m(x)$ y $M(x)$ no cambian en $I$. Lo que nos permite quitarnos el valor absoluto de las sumas. Al hacer esto, agrupamos los términos con y sin $x$, obteniendo una función lineal.
+    \label{P:linear}
+\end{proof}
+
+\begin{definition}
+    Para todo $x \in \R$, $p = \inf(T_x, x)$ y $q = \sup(T_x, x)$ se cumple que $\min \{ S_1(p), S_1(q) \} \le S_1(x)$.
+    \label{def_mn}
+\end{definition}
+
+\begin{proof}
+    Usando la Def.~\ref{def_fnok} sabemos que $S_1(x)$ se puede expresar como $m \cdot x + n$.
+
+    Analicemos tres casos:
+
+    \begin{enumerate}
+        \item Si $m > 0 \implies S_1(x)$ se minimiza en $p$.
+        \item Si $m < 0 \implies S_1(x)$ se minimiza en $q$.
+        \item Si $m = 0 \implies S_1(x)$ se minimiza en cualquier $t \in [p, q]$ (en particular en $p$ o en $q$).
+    \end{enumerate}
+
+    Por lo que queda demostrado.
+\end{proof}
+
+\newpage
+\begin{definition}
+    Existe un punto solución $(X, Y)$\footnote{Notar que el modelo tiene las restricciones $x_1 \le X \le x_2$ y $y_1 \le Y \le y_2$.} tal que $X \in T_x$ y $Y \in T_y$.
+    \label{def_sol}
+\end{definition}
+
+\begin{proof}
+    \hfill
+
+    Por la Def.~\ref{def_ind} sabemos que la coordenada $x$ es independiente de la $y$, lo que nos permite minimizar $X$ y $Y$ por separado. Sin pérdida de generalidad demostremos que $X$ es solución, ya que $Y$ es un caso simétrico.
+    
+    Supongamos que $X$ no pertenece a $T_x$, entonces existen números $p$ y $q$ tal que $p, q \in T_x$ y $p \le X \le q$; en particular se cumple que $p = \inf(T_x, X)$ y $q = \sup(T_x, X)$.
+    
+    Luego por la Def.~\ref{def_mn} nos encontramos en una contradicción, dado que encontramos un óptimo con valor menor o igual a $S_1(X)$ que sí pertenece a $T_x$.
+    
+    Por lo que $X$ tiene que pertenecer a $T_x$.
+\end{proof}
+
+Ahora por la Def.~\ref{def_sol} nuestro problema se reduce a evaluar cada elemento del conjunto $T_x$ y $T_y$ en $S_1$ y $S_2$ respectivamente.
 
 \subsubsection{Hallando el óptimo}
 
-Queremos minimizar $S_X$, para esto supongamos que $X$ es la solución y ordenemos de forma no decreciente los conjuntos $A$ y $B$ por su coordenada $X$. Centrémonos ahora en el miembro izquierdo de $S_X$, denotémoslos como $L$ y al derecho como $R$.
+Vamos a mostrar como evaluar $S_1(X)$, ya que $S_2(Y)$ es simétrico.
+
+En primer lugar ordenamos el conjunto $A$ por su coordenada $x$. Denotemos como $L$ al miembro izquierdo de $S_1(X)$ y como $R$ al miembro derecho.
 
 Definimos $p$ como la menor posición $i$ $(1 \le i \le |A|)$ tal que $X(A_i) > X$. Entonces se cumple que:
 
@@ -42,12 +135,6 @@ Definimos $p$ como la menor posición $i$ $(1 \le i \le |A|)$ tal que $X(A_i) > 
     L &=& L_1 + L_2
 \end{eqnarray*}
 
-En otras palabras, las coordenadas $x$ de las instalaciones $i$ desde $1$ hasta $p$ son todas menores o iguales a $X$ y el resto son mayores, por lo que podemos quitarnos el valor absoluto. Para $R$ nos queda algo similar.
+En otras palabras, las coordenadas $x$ de las instalaciones $i$ $(1 \le i < p)$ son todas menores o iguales a $X$ y el resto son mayores, por lo que podemos quitarnos el valor absoluto. Para $R$ nos queda algo similar. Notar que esto es lo que nos queda luego de desarrollar la demostración de la Def.~\ref{def_fnok} (solo teniendo en cuenta $L$).
 
-Lo importante acá es notar que tanto $L$ como $R$ son funciones lineales con variable $X$, y por tanto su suma $S_X$ también lo es.
-
-Ahora estamos en condiciones de concluir que $X$ debe pertenecer a las $x$'s originales (o $x_1, x_2$ que son los ``bordes'' del conjunto solución para esa coordenada).
-
-Supongamos que no, entonces existen dos coordenadas que pertenecen a las originales tal que $X$ está entre ellas, digamos que $s$ y $t$ $(s \le X \le t)$, pero como $S_X$ es una función lineal entonces podemos mover $X$ a $s$ o a $t$, en dependencia de la pendiente de la función, y obtener una solución menor o igual. Por lo que se cumple que $X$ pertenece a las coordenadas $x$'s originales (o a los ``bordes'' $x_1$ y $x_2$).
-
-Ahora solo tenemos que fijar un $X$, hay $O(n)$ de ellos, donde $n = |A| + |B|$; y hallar $L$ y $R$. Dado un $X$ fijo podemos hallar el costo correspondiente en $O(\log n )$, porque solo tenemos que buscar $p$ con una búsqueda binaria; y para hallar el costo podemos precalcular sumas acumulativas que nos van a permitir hallar la suma en un rango en $O(1)$. \footnote{Más detalles sobre esto se pueden ver en el código.} Por lo que podemos resolver el modelo en $O(n \log n)$.
+Ahora solo tenemos que fijar un $X \in T_x$, hay $O(n)$ de ellos, donde $n = \abs{T_x} = \abs{A} + \abs{B} + 2$; y hallar $L$ y $R$. Dado un $X$ fijo podemos hallar el costo correspondiente en $O(\log n )$, porque solo tenemos que buscar $p$ con una búsqueda binaria; y para hallar el costo podemos precalcular sumas acumulativas que nos van a permitir hallar la suma en un rango en $O(1)$. \footnote{Más detalles sobre esto se pueden ver en el código.} Por lo que podemos resolver el modelo en $O(n \log n)$.

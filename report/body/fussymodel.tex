@@ -1,5 +1,5 @@
 \newpage
-\subsection{FussyModel}
+\subsection{FuzzyModel}
 
 \begin{flalign}
     &\min f_A(X, Y)& \label{eq:1} \\
@@ -15,13 +15,20 @@ Sujeto a:
     y_1 \le &Y& \le y_2 \nonumber
 \end{eqnarray}
 
-Notar que \eqref{eq:cma} y \eqref{eq:cmb} son las coordenadas de los centroides de $A$ y $B$ respectivamente.
+Notar que \eqref{eq:cma} y \eqref{eq:cmb} son las coordenadas de los centroides de $A$ y $B$ respectivamente. Anteriormente se intentó usar:
+
+\begin{equation*}
+    \max f_B(X, Y) = \min_{1 \le j \le \abs{B}} \left\{ w(B_j) \cdot \left[ \abs{X(B_j) - X} + \abs{Y(B_j) - Y}  \right] \right\}
+\end{equation*}
+
+como segundo objetivo, pero esto probó tener una dificultad alta.
 
 En este modelo tenemos dos objetivos que queremos satisfacer a la vez. Para esto usamos \href{https://es.wikipedia.org/wiki/Conjunto_difuso}{Teoría de conjuntos difusos} y nos basamos en un resultado obtenido en \cite{Paper}.
 
 La idea general es resolver \eqref{eq:1} y \eqref{eq:2} por separado y luego combinar ambas soluciones en un modelo nuevo que al resolverlo nos dará la solución del modelo original con dos objetivos.
 
-\subsection{Camino a la solución}
+\newpage
+\subsection{Resolviendo FuzzyModel}
 
 En \cite{Paper} exponen un esquema de solución para un problema de optimización con $k$ objetivos. Seguimos ese esquema a continuación.
 
@@ -64,7 +71,6 @@ Y por tanto añadimos las siguientes restricciones:
     w(A_i) \cdot \left( p_i + q_i \right) &\le& Z_1
 \end{eqnarray*}
 
-\newpage
 En el segundo modelo al quitarle los valores absolutos nos queda:
 
 \begin{flalign*}
