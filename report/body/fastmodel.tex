@@ -18,10 +18,10 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
 
 \subsection{Resolviendo FastModel}
 
-\begin{definition}
+\begin{proposition}
     Podemos minimizar \eqref{fastmodel} minimizando los términos con $X$ y con $Y$ de forma independiente.
     \label{def_ind}
-\end{definition}
+\end{proposition}
 
 \begin{proof}
     Si separamos por coordenadas en \eqref{fastmodel}, nos queda:
@@ -63,10 +63,10 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
     La demostración es directa por la definición de ínfimo y supremo dada.
 \end{proof}
 
-\begin{definition}
+\begin{proposition}
     Para todo $x \in I$ donde $I = \left[\inf(T_x, x), \sup (T_x, x) \right]$ se cumple que $S_1(x)$ es una función lineal que depende de $x$.
     \label{def_fnok}
-\end{definition}
+\end{proposition}
 
 \begin{proof}
     \hfill
@@ -82,13 +82,13 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
     \label{P:linear}
 \end{proof}
 
-\begin{definition}
+\begin{proposition}
     Para todo $x \in \R$, $p = \inf(T_x, x)$ y $q = \sup(T_x, x)$ se cumple que $\min \{ S_1(p), S_1(q) \} \le S_1(x)$.
     \label{def_mn}
-\end{definition}
+\end{proposition}
 
 \begin{proof}
-    Usando la Def.~\ref{def_fnok} sabemos que $S_1(x)$ se puede expresar como $m \cdot x + n$.
+    Usando la Prop.~\ref{def_fnok} sabemos que $S_1(x)$ se puede expresar como $m \cdot x + n$.
 
     Analicemos tres casos:
 
@@ -102,24 +102,24 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
 \end{proof}
 
 \newpage
-\begin{definition}
+\begin{proposition}
     Existe un punto solución $(X, Y)$\footnote{Notar que el modelo tiene las restricciones $x_1 \le X \le x_2$ y $y_1 \le Y \le y_2$.} tal que $X \in T_x$ y $Y \in T_y$.
     \label{def_sol}
-\end{definition}
+\end{proposition}
 
 \begin{proof}
     \hfill
 
-    Por la Def.~\ref{def_ind} sabemos que la coordenada $x$ es independiente de la $y$, lo que nos permite minimizar $X$ y $Y$ por separado. Sin pérdida de generalidad demostremos que $X$ es solución, ya que $Y$ es un caso simétrico.
+    Por la Prop.~\ref{def_ind} sabemos que la coordenada $x$ es independiente de la $y$, lo que nos permite minimizar $X$ y $Y$ por separado. Sin pérdida de generalidad demostremos que $X$ es solución, ya que $Y$ es un caso simétrico.
     
     Supongamos que $X$ no pertenece a $T_x$, entonces existen números $p$ y $q$ tal que $p, q \in T_x$ y $p \le X \le q$; en particular se cumple que $p = \inf(T_x, X)$ y $q = \sup(T_x, X)$.
     
-    Luego por la Def.~\ref{def_mn} nos encontramos en una contradicción, dado que encontramos un óptimo con valor menor o igual a $S_1(X)$ que sí pertenece a $T_x$.
+    Luego por la Prop.~\ref{def_mn} nos encontramos en una contradicción, dado que encontramos un óptimo con valor menor o igual a $S_1(X)$ que sí pertenece a $T_x$.
     
     Por lo que $X$ tiene que pertenecer a $T_x$.
 \end{proof}
 
-Ahora por la Def.~\ref{def_sol} nuestro problema se reduce a evaluar cada elemento del conjunto $T_x$ y $T_y$ en $S_1$ y $S_2$ respectivamente.
+Ahora por la Prop.~\ref{def_sol} nuestro problema se reduce a evaluar cada elemento del conjunto $T_x$ y $T_y$ en $S_1$ y $S_2$ respectivamente.
 
 \subsubsection{Hallando el óptimo}
 
