@@ -46,27 +46,32 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
 \end{definition}
 
 \begin{definition}
-    Para todo conjunto $S$ tal que $S' = \{ -\infty, \infty \} \cup S$ y $x \in \R$ definimos como:
-
-    \begin{enumerate}
-        \item $\inf (S, x)$ al mayor $y \in S'$ tal que $y \le x$.
-        \item $\sup (S, x)$ al menor $y \in S'$ tal que $y \ge x$.
-    \end{enumerate}
+    Sean $k = \abs{T_x}$, $e_1 \le e_2 \le \ldots \le e_k$ los elementos de $T_x$ definimos los intervalos de $T_x$ como $I_{i} = [ e_i, e_{i+1}]$ para todo $i$ $(1 \le i < k)$.
+    \label{d:intervalos}
 \end{definition}
 
 \begin{collorary}
-    No existe $t \in S \cap \left[ \inf(S, x), \sup (S, x) \right]$ tal que $t \neq x$.
+    Sea $I_i = [e_i, e_{i+1}]$ un intervalo de $T_x$, para todo $i$ $(1 \le i < k)$ se cumple que no existe $t \in T_x \cap (e_i, e_{i+1})$. \footnote{Informalmente esto significa que los únicos elementos de $T_x$ que están en $I_i$ son los extremos de dicho intervalo.}
     \label{C:1}
 \end{collorary}
 
 \begin{proof}
-    La demostración es directa por la definición de ínfimo y supremo dada.
+    La demostración es directa por la definición de los intervalos (Def. \ref{d:intervalos}).
+\end{proof}
+
+\begin{collorary}
+    $\displaystyle \bigcup_{i=1}^{k-1} I_i = [x_1, x_2]$.
+    \label{C:2}
+\end{collorary}
+
+\begin{proof}
+    La demostración es directa por la definición de los intervalos (Def. \ref{d:intervalos}).
 \end{proof}
 
 \begin{proposition}
-    Para todo $x \in I$ donde $I = \left[\inf(T_x, x), \sup (T_x, x) \right]$ se cumple que $S_1(x)$ es una función lineal que depende de $x$.
+    Sea $I$ un intervalo de $T_x$, para todo $x \in I$ se cumple que $S_1(x)$ es una función lineal que depende de $x$.
     \label{def_fnok}
-\end{proposition}
+\end{proposition} 
 
 \begin{proof}
     \hfill
@@ -83,7 +88,7 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
 \end{proof}
 
 \begin{proposition}
-    Para todo $x \in \R$, $p = \inf(T_x, x)$ y $q = \sup(T_x, x)$ se cumple que $\min \{ S_1(p), S_1(q) \} \le S_1(x)$.
+    Sea $I_i = [e_i, e_{i+1}]$ un intervalo de $T_x$, para todo $x \in I$ se cumple que $\min \{ S_1(e_i), S_1(e_{i+1}) \} \le S_1(x)$.
     \label{def_mn}
 \end{proposition}
 
@@ -93,17 +98,16 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
     Analicemos tres casos:
 
     \begin{enumerate}
-        \item Si $m > 0 \implies S_1(x)$ se minimiza en $p$.
-        \item Si $m < 0 \implies S_1(x)$ se minimiza en $q$.
-        \item Si $m = 0 \implies S_1(x)$ se minimiza en cualquier $t \in [p, q]$ (en particular en $p$ o en $q$).
+        \item Si $m > 0 \implies S_1(x)$ se minimiza en $e_i$.
+        \item Si $m < 0 \implies S_1(x)$ se minimiza en $e_{i+1}$.
+        \item Si $m = 0 \implies S_1(x)$ se minimiza en cualquier $t \in I$ (en particular en $e_i$ o en $e_{i+1}$).
     \end{enumerate}
 
     Por lo que queda demostrado.
 \end{proof}
 
-\newpage
 \begin{proposition}
-    Existe un punto solución $(X, Y)$\footnote{Notar que el modelo tiene las restricciones $x_1 \le X \le x_2$ y $y_1 \le Y \le y_2$.} tal que $X \in T_x$ y $Y \in T_y$.
+    Existe un punto solución $(X, Y)$ tal que $X \in T_x$, $Y \in T_y$, $x_1 \le X \le x_2$ y $y_1 \le Y \le y_2$.
     \label{def_sol}
 \end{proposition}
 
@@ -112,7 +116,7 @@ Este modelo opta por minimizar la diferencia entre la ``cercanía'' y ``lejanía
 
     Por la Prop.~\ref{def_ind} sabemos que la coordenada $x$ es independiente de la $y$, lo que nos permite minimizar $X$ y $Y$ por separado. Sin pérdida de generalidad demostremos que $X$ es solución, ya que $Y$ es un caso simétrico.
     
-    Supongamos que $X$ no pertenece a $T_x$, entonces existen números $p$ y $q$ tal que $p, q \in T_x$ y $p \le X \le q$; en particular se cumple que $p = \inf(T_x, X)$ y $q = \sup(T_x, X)$.
+    Supongamos que $X$ no pertenece a $T_x$, entonces existe un intervalo $I_i$ de $T_x$ al cual $X$ pertenece. Esto es obvio dado que $x_1 \le X \le x_2$ y por lo obtenido en el Colorario \ref{C:2}.
     
     Luego por la Prop.~\ref{def_mn} nos encontramos en una contradicción, dado que encontramos un óptimo con valor menor o igual a $S_1(X)$ que sí pertenece a $T_x$.
     
@@ -135,6 +139,8 @@ Definimos $p$ como la menor posición $i$ $(1 \le i \le |A|)$ tal que $X(A_i) > 
     L &=& L_1 + L_2
 \end{eqnarray*}
 
-En otras palabras, las coordenadas $x$ de las instalaciones $i$ $(1 \le i < p)$ son todas menores o iguales a $X$ y el resto son mayores, por lo que podemos quitarnos el valor absoluto. Para $R$ nos queda algo similar. Notar que esto es lo que nos queda luego de desarrollar la demostración de la Def.~\ref{def_fnok} (solo teniendo en cuenta $L$).
+En otras palabras, las coordenadas $x$ de las instalaciones $i$ $(1 \le i < p)$ son todas menores o iguales a $X$ y el resto son mayores, por lo que podemos quitarnos el valor absoluto. Para $R$ nos queda algo similar. Notar que esto es lo que nos queda luego de desarrollar la demostración de la Prop.~\ref{def_fnok} (solo teniendo en cuenta $L$).
 
 Ahora solo tenemos que fijar un $X \in T_x$, hay $O(n)$ de ellos, donde $n = \abs{T_x} = \abs{A} + \abs{B} + 2$; y hallar $L$ y $R$. Dado un $X$ fijo podemos hallar el costo correspondiente en $O(\log n )$, porque solo tenemos que buscar $p$ con una búsqueda binaria; y para hallar el costo podemos precalcular sumas acumulativas que nos van a permitir hallar la suma en un rango en $O(1)$. \footnote{Más detalles sobre esto se pueden ver en el código.} Por lo que podemos resolver el modelo en $O(n \log n)$.
+
+\textbf{Es importante notar la eficiencia de la solución obtenida; es un $O(n \log n)$ con una constante muy baja. Esta solución funciona muy rápido para conjuntos de puntos en el orden de $10^7$ elementos.}
