@@ -38,8 +38,8 @@ class LoadDialog(qtw.QDialog):
 
         self.comboModels = qtw.QComboBox()
         self.comboModels.addItem(FastModel.__repr__, [FastModel])
-        self.comboModels.addItem(FussyModel.__repr__, [FussyModel])
-        self.comboModels.addItem(f'{FastModel.__repr__}, {FussyModel.__repr__}', [FastModel, FussyModel])
+        # self.comboModels.addItem(FussyModel.__repr__, [FussyModel])
+        # self.comboModels.addItem(f'{FastModel.__repr__}, {FussyModel.__repr__}', [FastModel, FussyModel])
 
         self.form = qtw.QFormLayout()
         self.form.addRow('Action', self.comboAction)
@@ -212,7 +212,7 @@ class CentralWidget(qtw.QWidget):
         ptext = self.textEditor.toPlainText()
         ctext = ptext or SidebarPlaceholderSample
 
-        self.controller.loadText(ctext, [FastModel, FussyModel])
+        self.controller.loadText(ctext, [FastModel])
 
         if not ptext:
             self.textEditor.setPlainText(ctext)
